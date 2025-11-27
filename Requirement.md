@@ -59,6 +59,54 @@ Every speaker is simply “in today’s meeting.” Every judge picks any speake
 | N6 | No user accounts or passwords for judges or families                       |
 | N7 | Admin panel protected only by one hard-coded password in `.env`            |
 
+## Official NCFCA 2025-2026 Ballot Templates
+
+The system must support the following 10 official NCFCA speech event types, each with their specific rubric structure:
+
+### Speech Event Types
+
+1. **Persuasive** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Persuasive-.pdf)
+2. **Oratorical** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Oratorical.pdf)
+3. **Open Interpretation** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Open-.pdf)
+4. **Informative** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Informative-.pdf)
+5. **Impromptu** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Impromptu-.pdf)
+6. **Extemporaneous** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Extemporaneous.pdf)
+7. **Duo Interpretation** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Duo-.pdf)
+8. **Digital Presentation** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Digital-Presentation.pdf)
+9. **Biblical Thematic** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Biblical-.pdf)
+10. **Apologetics** - [Sample Ballot](https://ncfca.org/wp-content/uploads/25-26-Ballot-Sample-_-Apologetics-.pdf)
+
+All ballot samples are stored in `/ballot-samples/` directory for reference during development.
+
+### Common Rubric Structure (All Events)
+
+Each ballot consists of **5 scoring categories**, each rated on a scale of 1-5:
+
+1. **Content** - Topic, ideas, thesis, support, analysis
+2. **Organization & Citations** - Structure, transitions, verbal citations
+3. **Vocal Delivery** - Articulation, volume, rate, pitch, tone
+4. **Physical Delivery** - Poise, gestures, eye contact, movement
+5. **Impact** - Connection, persuasiveness, relevance, speaker effectiveness
+
+**Additional Fields:**
+- Judge Name (free text)
+- Event Selection (dropdown)
+- Total Time (minutes:seconds)
+- Speaker Rank (1-5, where 1 is best)
+- Comments (text area for each category)
+- Overall Comments (text area)
+
+**Scoring Guidelines:**
+- 1 = Beginning
+- 2 = Developing
+- 3 = Capable
+- 4 = Proficient
+- 5 = Excellent
+
+Each category has specific descriptors per score level that vary slightly by event type.
+
+---
+
 This is now the absolute simplest possible version that still works perfectly for your club.
 
-Copy-paste this entire document into your repo’s `README.md` — you are 100% ready for development.
+Copy-paste this entire document into your repo's `README.md` — you are 100% ready for development.
