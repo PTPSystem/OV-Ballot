@@ -52,18 +52,25 @@ OV-Ballot is an NCFCA (National Christian Forensics and Communications Associati
 
 ### 10 Official Event Types
 
-All event types share the same 5-category rubric structure:
+Event types have two different rubric structures:
 
+**Platform/Speaking Events** (6 events):
 1. **Persuasive**
-2. **Oratorical**
-3. **Open Interpretation**
-4. **Informative**
-5. **Impromptu**
-6. **Extemporaneous**
-7. **Duo Interpretation**
-8. **Digital Presentation**
-9. **Biblical Thematic**
-10. **Apologetics**
+2. **Informative**
+3. **Impromptu**
+4. **Extemporaneous**
+5. **Digital Presentation**
+6. **Apologetics**
+
+Categories: Content, Organization & Citations, Vocal Delivery, Physical Delivery, Impact
+
+**Interpretation Events** (4 events):
+7. **Oratorical**
+8. **Open Interpretation**
+9. **Duo Interpretation**
+10. **Biblical Thematic**
+
+Categories: Content, Organization & Citations, Characterization, Blocking, Impact
 
 ### Ballot Scoring Structure
 
@@ -71,10 +78,18 @@ Each ballot contains:
 
 **5 Required Scores** (1-5 scale each):
 
+**For Platform/Speaking Events:**
 - Content
 - Organization & Citations
 - Vocal Delivery
 - Physical Delivery
+- Impact
+
+**For Interpretation Events:**
+- Content
+- Organization & Citations
+- Characterization
+- Blocking
 - Impact
 
 **Additional Required Fields:**
@@ -209,17 +224,24 @@ CREATE TABLE ballots (
     -- Judge name as typed by judge (free text)
     
     -- 5 scoring categories (1-5 scale each)
+    -- Categories vary by event type:
+    -- Platform/Speaking: content, organization_citations, vocal_delivery, physical_delivery, impact
+    -- Interpretation: content, organization_citations, characterization, blocking, impact
     score_content INT CHECK (score_content BETWEEN 1 AND 5),
-    score_organization INT CHECK (score_organization BETWEEN 1 AND 5),
-    score_vocal_delivery INT CHECK (score_vocal_delivery BETWEEN 1 AND 5),
-    score_physical_delivery INT CHECK (score_physical_delivery BETWEEN 1 AND 5),
+    score_organization_citations INT CHECK (score_organization_citations BETWEEN 1 AND 5),
+    score_category_3 INT CHECK (score_category_3 BETWEEN 1 AND 5),
+    -- vocal_delivery OR characterization depending on event type
+    score_category_4 INT CHECK (score_category_4 BETWEEN 1 AND 5),
+    -- physical_delivery OR blocking depending on event type
     score_impact INT CHECK (score_impact BETWEEN 1 AND 5),
     
     -- Comments for each category
     comments_content TEXT,
-    comments_organization TEXT,
-    comments_vocal_delivery TEXT,
-    comments_physical_delivery TEXT,
+    comments_organization_citations TEXT,
+    comments_category_3 TEXT,
+    -- vocal_delivery OR characterization comments
+    comments_category_4 TEXT,
+    -- physical_delivery OR blocking comments
     comments_impact TEXT,
     overall_comments TEXT,
     
@@ -291,16 +313,19 @@ CREATE INDEX idx_audit_created ON audit_logs(created_at DESC);
 
 ```sql
 INSERT INTO event_types (name, display_name, rubric_config) VALUES
-('persuasive', 'Persuasive', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('oratorical', 'Oratorical', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('open_interpretation', 'Open Interpretation', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('informative', 'Informative', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('impromptu', 'Impromptu', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('extemporaneous', 'Extemporaneous', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('duo_interpretation', 'Duo Interpretation', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('digital_presentation', 'Digital Presentation', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('biblical_thematic', 'Biblical Thematic', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}'),
-('apologetics', 'Apologetics', '{"categories": ["content", "organization", "vocal_delivery", "physical_delivery", "impact"]}');
+-- Platform/Speaking Events (Vocal Delivery + Physical Delivery)
+('persuasive', 'Persuasive', '{"categories": ["content", "organization_citations", "vocal_delivery", "physical_delivery", "impact"], "type": "platform"}'),
+('informative', 'Informative', '{"categories": ["content", "organization_citations", "vocal_delivery", "physical_delivery", "impact"], "type": "platform"}'),
+('impromptu', 'Impromptu', '{"categories": ["content", "organization_citations", "vocal_delivery", "physical_delivery", "impact"], "type": "platform"}'),
+('extemporaneous', 'Extemporaneous', '{"categories": ["content", "organization_citations", "vocal_delivery", "physical_delivery", "impact"], "type": "platform"}'),
+('digital_presentation', 'Digital Presentation', '{"categories": ["content", "organization_citations", "vocal_delivery", "physical_delivery", "impact"], "type": "platform"}'),
+('apologetics', 'Apologetics', '{"categories": ["content", "organization_citations", "vocal_delivery", "physical_delivery", "impact"], "type": "platform"}'),
+
+-- Interpretation Events (Characterization + Blocking)
+('oratorical', 'Oratorical', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}'),
+('open_interpretation', 'Open Interpretation', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}'),
+('duo_interpretation', 'Duo Interpretation', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}'),
+('biblical_thematic', 'Biblical Thematic', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}');
 ```
 
 ## TypeScript Type Definitions
@@ -380,19 +405,36 @@ export interface Ballot {
 
 export interface BallotScores {
   content: number;
-  organization: number;
-  vocal_delivery: number;
-  physical_delivery: number;
+  organization_citations: number;
+  category_3: number;  // vocal_delivery OR characterization
+  category_4: number;  // physical_delivery OR blocking
   impact: number;
 }
 
 export interface BallotComments {
   content?: string;
-  organization?: string;
-  vocal_delivery?: string;
-  physical_delivery?: string;
+  organization_citations?: string;
+  category_3?: string;  // vocal_delivery OR characterization comments
+  category_4?: string;  // physical_delivery OR blocking comments
   impact?: string;
   overall?: string;
+}
+
+// Helper types for specific event categories
+export interface PlatformBallotScores {
+  content: number;
+  organization_citations: number;
+  vocal_delivery: number;
+  physical_delivery: number;
+  impact: number;
+}
+
+export interface InterpretationBallotScores {
+  content: number;
+  organization_citations: number;
+  characterization: number;
+  blocking: number;
+  impact: number;
 }
 
 export interface AuditLog {
@@ -746,18 +788,22 @@ model Ballot {
   eventTypeId            Int        @map("event_type_id")
   judgeName              String     @map("judge_name") @db.VarChar(200)
   
-  scoreContent           Int?       @map("score_content")
-  scoreOrganization      Int?       @map("score_organization")
-  scoreVocalDelivery     Int?       @map("score_vocal_delivery")
-  scorePhysicalDelivery  Int?       @map("score_physical_delivery")
-  scoreImpact            Int?       @map("score_impact")
+  scoreContent                Int?       @map("score_content")
+  scoreOrganizationCitations  Int?       @map("score_organization_citations")
+  scoreCategory3              Int?       @map("score_category_3")
+  // vocal_delivery OR characterization
+  scoreCategory4              Int?       @map("score_category_4")
+  // physical_delivery OR blocking
+  scoreImpact                 Int?       @map("score_impact")
   
-  commentsContent           String?    @map("comments_content") @db.Text
-  commentsOrganization      String?    @map("comments_organization") @db.Text
-  commentsVocalDelivery     String?    @map("comments_vocal_delivery") @db.Text
-  commentsPhysicalDelivery  String?    @map("comments_physical_delivery") @db.Text
-  commentsImpact            String?    @map("comments_impact") @db.Text
-  overallComments           String?    @map("overall_comments") @db.Text
+  commentsContent                String?    @map("comments_content") @db.Text
+  commentsOrganizationCitations  String?    @map("comments_organization_citations") @db.Text
+  commentsCategory3              String?    @map("comments_category_3") @db.Text
+  // vocal_delivery OR characterization comments
+  commentsCategory4              String?    @map("comments_category_4") @db.Text
+  // physical_delivery OR blocking comments
+  commentsImpact                 String?    @map("comments_impact") @db.Text
+  overallComments                String?    @map("overall_comments") @db.Text
   
   totalTimeSeconds       Int?       @map("total_time_seconds")
   speakerRank            Int?       @map("speaker_rank")
