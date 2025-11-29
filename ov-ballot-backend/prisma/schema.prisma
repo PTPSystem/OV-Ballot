@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tournament {
+  id          String      @id @default(uuid()) @db.Uuid
+  name        String      @db.VarChar(200)
+  meetingDate DateTime    @map("meeting_date") @db.Date
+  status      String      @default("active") @db.VarChar(20)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp
+  closedAt    DateTime?   @map("closed_at") @db.Timestamp
+  
+  competitors Competitor[]
+  ballots     Ballot[]
+
+  @@map("tournaments")
+}
+
+model Competitor {
+  id              String     @id @default(uuid()) @db.Uuid
+  tournamentId    String     @map("tournament_id") @db.Uuid
+  firstName       String     @map("first_name") @db.VarChar(100)
+  lastName        String     @map("last_name") @db.VarChar(100)
+  email           String     @db.VarChar(255)
+  magicToken      String     @unique @default(uuid()) @map("magic_token") @db.Uuid
+  magicLinkSentAt DateTime?  @map("magic_link_sent_at") @db.Timestamp
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamp
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamp
+  
+  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  ballots         Ballot[]
+
+  @@map("competitors")
+}
+
+model EventType {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique @db.VarChar(50)
+  displayName  String    @map("display_name") @db.VarChar(100)
+  rubricConfig Json      @map("rubric_config") @db.JsonB
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp
+  
+  ballots      Ballot[]
+
+  @@map("event_types")
+}
+
+model Ballot {
+  id                     String     @id @default(uuid()) @db.Uuid
+  tournamentId           String     @map("tournament_id") @db.Uuid
+  competitorId           String     @map("competitor_id") @db.Uuid
+  eventTypeId            Int        @map("event_type_id")
+  judgeName              String     @map("judge_name") @db.VarChar(200)
+  
+  scoreContent                Int?       @map("score_content")
+  scoreOrganizationCitations  Int?       @map("score_organization_citations")
+  scoreCategory3              Int?       @map("score_category_3")
+  scoreCategory4              Int?       @map("score_category_4")
+  scoreImpact                 Int?       @map("score_impact")
+  
+  commentsContent                String?    @map("comments_content") @db.Text
+  commentsOrganizationCitations  String?    @map("comments_organization_citations") @db.Text
+  commentsCategory3              String?    @map("comments_category_3") @db.Text
+  commentsCategory4              String?    @map("comments_category_4") @db.Text
+  commentsImpact                 String?    @map("comments_impact") @db.Text
+  overallComments                String?    @map("overall_comments") @db.Text
+  
+  totalTimeSeconds       Int?       @map("total_time_seconds")
+  speakerRank            Int?       @map("speaker_rank")
+  
+  status                 String     @default("draft") @db.VarChar(20)
+  draftSavedAt           DateTime?  @map("draft_saved_at") @db.Timestamp
+  submittedAt            DateTime?  @map("submitted_at") @db.Timestamp
+  
+  ipAddress              String?    @map("ip_address")
+  userAgent              String?    @map("user_agent") @db.Text
+  deviceId               String?    @map("device_id") @db.VarChar(100)
+  
+  createdAt              DateTime   @default(now()) @map("created_at") @db.Timestamp
+  updatedAt              DateTime   @updatedAt @map("updated_at") @db.Timestamp
+  
+  tournament             Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  competitor             Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  eventType              EventType  @relation(fields: [eventTypeId], references: [id])
+
+  @@map("ballots")
+}
+
+model AdminUser {
+  id           String      @id @default(uuid()) @db.Uuid
+  username     String      @unique @db.VarChar(50)
+  passwordHash String      @map("password_hash") @db.VarChar(255)
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamp
+  lastLogin    DateTime?   @map("last_login") @db.Timestamp
+  
+  auditLogs    AuditLog[]
+
+  @@map("admin_users")
+}
+
+model AuditLog {
+  id          String     @id @default(uuid()) @db.Uuid
+  action      String     @db.VarChar(50)
+  entityType  String?    @map("entity_type") @db.VarChar(50)
+  entityId    String?    @map("entity_id") @db.Uuid
+  adminUserId String?    @map("admin_user_id") @db.Uuid
+  ipAddress   String?    @map("ip_address")
+  userAgent   String?    @map("user_agent") @db.Text
+  details     Json?      @db.JsonB
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp
+  
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id])
+
+  @@map("audit_logs")
+}

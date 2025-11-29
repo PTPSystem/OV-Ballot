@@ -68,7 +68,7 @@ Categories: Content, Organization & Citations, Vocal Delivery, Physical Delivery
 7. **Oratorical**
 8. **Open Interpretation**
 9. **Duo Interpretation**
-10. **Biblical Thematic**
+10. **Biblical Presentation**
 
 Categories: Content, Organization & Citations, Characterization, Blocking, Impact
 
@@ -325,7 +325,7 @@ INSERT INTO event_types (name, display_name, rubric_config) VALUES
 ('oratorical', 'Oratorical', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}'),
 ('open_interpretation', 'Open Interpretation', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}'),
 ('duo_interpretation', 'Duo Interpretation', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}'),
-('biblical_thematic', 'Biblical Thematic', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}');
+('biblical_presentation', 'Biblical Presentation', '{"categories": ["content", "organization_citations", "characterization", "blocking", "impact"], "type": "interpretation"}');
 ```
 
 ## TypeScript Type Definitions
